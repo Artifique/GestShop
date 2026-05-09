@@ -13,8 +13,8 @@ import { authService } from "@/lib/services/authService";
 import { productService } from "@/lib/services/productService";
 import { customerService } from "@/lib/services/customerService";
 import { useState, useEffect } from "react";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28'];
 
@@ -119,41 +119,46 @@ export default function ReportsPage() {
   };
 
   const handleDownloadPDF = async (reportType: string, title: string) => {
-    const doc = new jsPDF();
-    doc.setFont("helvetica", "bold");
-    doc.text(title, 14, 20);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(`Généré le: ${new Date().toLocaleDateString()}`, 14, 26);
-    
-    if (reportType === "Financier") {
-       const tableColumn = ["Date", "Client", "Montant", "Méthode"];
-       const tableRows = allSales.map(s => [
-         new Date(s.created_at).toLocaleDateString(),
-         s.customers?.name || "Client de passage",
-         `${s.total_amount.toFixed(2)} €`,
-         s.payment_method
-       ]);
-       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
-    } else if (reportType === "Stock") {
-       const prods = await productService.getAll();
-       const tableColumn = ["Produit", "SKU", "Stock", "Prix"];
-       const tableRows = prods.map(p => [
-         p.name, p.sku, p.stock.toString(), `${p.price.toFixed(2)} €`
-       ]);
-       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
-    } else if (reportType === "Clients") {
-       const custs = await customerService.getAll();
-       const tableColumn = ["Nom", "Email", "Téléphone"];
-       const tableRows = custs.map(c => [
-         c.name, c.email || "-", c.phone || "-"
-       ]);
-       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
-    } else {
-       doc.text("Rapport détaillé en cours de préparation...", 14, 40);
+    try {
+      const doc = new jsPDF();
+      doc.setFont("helvetica", "bold");
+      doc.text(title, 14, 20);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`Généré le: ${new Date().toLocaleDateString()}`, 14, 26);
+      
+      if (reportType === "Financier") {
+         const tableColumn = ["Date", "Client", "Montant", "Méthode"];
+         const tableRows = allSales.map(s => [
+           new Date(s.created_at).toLocaleDateString(),
+           s.customers?.name || "Client de passage",
+           `${s.total_amount.toFixed(2)} €`,
+           s.payment_method
+         ]);
+         autoTable(doc, { head: [tableColumn], body: tableRows, startY: 35 });
+      } else if (reportType === "Stock") {
+         const prods = await productService.getAll();
+         const tableColumn = ["Produit", "SKU", "Stock", "Prix"];
+         const tableRows = prods.map(p => [
+           p.name, p.sku, p.stock.toString(), `${p.price.toFixed(2)} €`
+         ]);
+         autoTable(doc, { head: [tableColumn], body: tableRows, startY: 35 });
+      } else if (reportType === "Clients") {
+         const custs = await customerService.getAll();
+         const tableColumn = ["Nom", "Email", "Téléphone"];
+         const tableRows = custs.map(c => [
+           c.name, c.email || "-", c.phone || "-"
+         ]);
+         autoTable(doc, { head: [tableColumn], body: tableRows, startY: 35 });
+      } else {
+         doc.text("Rapport détaillé en cours de préparation...", 14, 40);
+      }
+      
+      doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
+    } catch (error) {
+      console.error("Erreur lors de la génération du PDF:", error);
+      alert("Une erreur est survenue lors de la création du PDF.");
     }
-    
-    doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
   };
 
   return (
