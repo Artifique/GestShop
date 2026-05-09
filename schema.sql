@@ -127,13 +127,13 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- 7. DEFAULT ADMIN (admin@tonomi.com / Admin123!)
+-- 7. DEFAULT ADMIN (gestshop@gmail.com / Admin123!)
 -- This part creates the user in auth.users and the trigger handles the profile.
 DO $$
 DECLARE
   new_user_id UUID := gen_random_uuid();
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'admin@tonomi.com') THEN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'gestshop@gmail.com') THEN
     INSERT INTO auth.users (
       instance_id,
       id,
@@ -155,7 +155,7 @@ BEGIN
       new_user_id,
       'authenticated',
       'authenticated',
-      'admin@tonomi.com',
+      'gestshop@gmail.com',
       crypt('Admin123!', gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}',
