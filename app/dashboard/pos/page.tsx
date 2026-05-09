@@ -188,21 +188,21 @@ export default function PosPage() {
       </div>
 
       {/* Right Area: Cart & Checkout */}
-      <div className="w-full lg:w-[400px] flex flex-col gap-6">
-        <div className="glass-card rounded-[32px] p-8 flex-1 flex flex-col shadow-2xl shadow-primary/5">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-black text-foreground flex items-center gap-2 uppercase tracking-tighter">
-              <ShoppingCart className="h-6 w-6 text-primary" />
+      <div className="w-full lg:w-[380px] flex flex-col gap-4">
+        <div className="glass-card rounded-[24px] p-5 flex-1 flex flex-col shadow-2xl shadow-primary/5 overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-black text-foreground flex items-center gap-2 uppercase tracking-tighter">
+              <ShoppingCart className="h-5 w-5 text-primary" />
               Panier Actuel
             </h3>
-            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-black">{cart.length} Articles</span>
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black">{cart.length} Articles</span>
           </div>
 
-          <div className="mb-6 space-y-4">
-             <div className="grid gap-2">
+          <div className="mb-4 space-y-3 shrink-0">
+             <div className="grid gap-1.5">
                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Client</label>
                <select 
-                 className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold appearance-none"
+                 className="w-full h-10 px-3 text-sm bg-muted/50 border border-border/50 text-foreground rounded-xl focus:border-primary outline-none transition-all font-bold appearance-none"
                  value={selectedCustomerId}
                  onChange={(e) => setSelectedCustomerId(e.target.value)}
                >
@@ -214,48 +214,48 @@ export default function PosPage() {
              </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 mb-8">
+          <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar space-y-3 mb-4">
             {cart.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 group">
-                <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <Package className="h-6 w-6 text-muted-foreground/50" />
+              <div key={item.id} className="flex items-center gap-3 group">
+                <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                  <Package className="h-5 w-5 text-muted-foreground/50" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-foreground text-sm truncate">{item.name}</h4>
+                  <h4 className="font-bold text-foreground text-xs truncate">{item.name}</h4>
                   <p className="text-primary font-black text-xs">{item.price.toFixed(2)} €</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button onClick={() => updateQuantity(item.id, -1)} className="p-1 rounded-lg bg-muted hover:bg-border transition-colors">
                     <Minus className="h-3 w-3" />
                   </button>
-                  <span className="font-black text-sm w-4 text-center">{item.quantity}</span>
+                  <span className="font-black text-xs w-4 text-center">{item.quantity}</span>
                   <button onClick={() => updateQuantity(item.id, 1)} className="p-1 rounded-lg bg-muted hover:bg-border transition-colors">
                     <Plus className="h-3 w-3" />
                   </button>
-                  <button onClick={() => removeFromCart(item.id)} className="p-1 text-muted-foreground hover:text-rose-500 transition-colors ml-2">
-                    <Trash2 className="h-4 w-4" />
+                  <button onClick={() => removeFromCart(item.id)} className="p-1 text-muted-foreground hover:text-rose-500 transition-colors ml-1">
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
             ))}
             {cart.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground italic">
-                <ShoppingCart className="h-12 w-12 mb-4 opacity-10" />
-                <p>Panier vide</p>
+              <div className="flex flex-col items-center justify-center py-10 text-muted-foreground italic">
+                <ShoppingCart className="h-10 w-10 mb-3 opacity-10" />
+                <p className="text-sm">Panier vide</p>
               </div>
             )}
           </div>
 
-          <div className="space-y-4 pt-6 border-t border-border/50">
-            <div className="grid gap-2 mb-4">
-               <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Méthode de Paiement</label>
+          <div className="space-y-4 pt-4 border-t border-border/50 shrink-0">
+            <div className="grid gap-2">
+               <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Paiement</label>
                <div className="flex gap-2">
                  {['cash', 'card'].map((method) => (
                    <button 
                     key={method}
                     onClick={() => setPaymentMethod(method)}
                     className={cn(
-                      "flex-1 py-2 rounded-xl border font-bold text-xs uppercase tracking-widest transition-all",
+                      "flex-1 py-1.5 rounded-lg border font-bold text-[10px] uppercase tracking-widest transition-all",
                       paymentMethod === method ? "bg-primary/10 border-primary text-primary" : "bg-muted/30 border-border/50 text-muted-foreground"
                     )}
                    >
@@ -267,16 +267,16 @@ export default function PosPage() {
 
             <div className="flex justify-between items-end">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pb-1">Total à payer</span>
-              <span className="text-4xl font-black text-primary tracking-tighter">{total.toFixed(2)} €</span>
+              <span className="text-3xl font-black text-primary tracking-tighter">{total.toFixed(2)} €</span>
             </div>
             
             <button 
               disabled={cart.length === 0}
               onClick={handleCheckout}
-              className="w-full py-5 rounded-2xl bg-primary text-primary-foreground font-black text-xl shadow-xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-black text-lg shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <CreditCard className="h-6 w-6" />
-              Payer maintenant
+              <CreditCard className="h-5 w-5" />
+              Payer
             </button>
           </div>
         </div>
