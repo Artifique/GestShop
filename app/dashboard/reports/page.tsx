@@ -10,7 +10,11 @@ import {
 import { useRouter } from "next/navigation";
 import { saleService } from "@/lib/services/saleService";
 import { authService } from "@/lib/services/authService";
+import { productService } from "@/lib/services/productService";
+import { customerService } from "@/lib/services/customerService";
 import { useState, useEffect } from "react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28'];
 
@@ -19,6 +23,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [allSales, setAllSales] = useState<any[]>([]);
 
   useEffect(() => {
     async function checkAccess() {
@@ -34,6 +39,7 @@ export default function ReportsPage() {
       setLoading(true);
       const sales = await saleService.getDashboardStats();
       if (!sales) return;
+      setAllSales(sales);
 
       // 1. Weekly Revenue Data
       const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -81,11 +87,74 @@ export default function ReportsPage() {
   }, []);
 
   const reports = [
-    { title: "Rapport de Ventes Quotidien", description: "Résumé des ventes et transactions pour la journée.", date: "08 Mai 2024", type: "Financier" },
-    { title: "Analyse d'Inventaire", description: "État des stocks, articles à faible rotation et ruptures.", date: "07 Mai 2024", type: "Stock" },
-    { title: "Performance des Produits", description: "Top 10 des produits les plus vendus ce mois-ci.", date: "01 Mai 2024", type: "Marketing" },
-    { title: "Fidélité Client", description: "Analyse du comportement d'achat et taux de rétention.", date: "30 Avr 2024", type: "Clients" },
+    { title: "Rapport de Ventes Quotidien", description: "Résumé des ventes et transactions pour la journée.", date: new Date().toLocaleDateString(), type: "Financier" },
+    { title: "Analyse d'Inventaire", description: "État des stocks, articles à faible rotation et ruptures.", date: new Date().toLocaleDateString(), type: "Stock" },
+    { title: "Performance des Produits", description: "Top 10 des produits les plus vendus ce mois-ci.", date: new Date().toLocaleDateString(), type: "Marketing" },
+    { title: "Fidélité Client", description: "Analyse du comportement d'achat et taux de rétention.", date: new Date().toLocaleDateString(), type: "Clients" },
   ];
+
+  const handleExportCSV = () => {
+    if (allSales.length === 0) return;
+    
+    const headers = ["Date", "Client", "Total", "Méthode Paiement"];
+    const csvRows = [];
+    csvRows.push(headers.join(","));
+    
+    allSales.forEach(sale => {
+      const date = new Date(sale.created_at).toLocaleDateString();
+      const client = sale.customers?.name || "Client de passage";
+      const total = sale.total_amount;
+      const method = sale.payment_method;
+      csvRows.push(`"${date}","${client}",${total},"${method}"`);
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "rapport_ventes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadPDF = async (reportType: string, title: string) => {
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.text(title, 14, 20);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Généré le: ${new Date().toLocaleDateString()}`, 14, 26);
+    
+    if (reportType === "Financier") {
+       const tableColumn = ["Date", "Client", "Montant", "Méthode"];
+       const tableRows = allSales.map(s => [
+         new Date(s.created_at).toLocaleDateString(),
+         s.customers?.name || "Client de passage",
+         `${s.total_amount.toFixed(2)} €`,
+         s.payment_method
+       ]);
+       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
+    } else if (reportType === "Stock") {
+       const prods = await productService.getAll();
+       const tableColumn = ["Produit", "SKU", "Stock", "Prix"];
+       const tableRows = prods.map(p => [
+         p.name, p.sku, p.stock.toString(), `${p.price.toFixed(2)} €`
+       ]);
+       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
+    } else if (reportType === "Clients") {
+       const custs = await customerService.getAll();
+       const tableColumn = ["Nom", "Email", "Téléphone"];
+       const tableRows = custs.map(c => [
+         c.name, c.email || "-", c.phone || "-"
+       ]);
+       (doc as any).autoTable({ head: [tableColumn], body: tableRows, startY: 35 });
+    } else {
+       doc.text("Rapport détaillé en cours de préparation...", 14, 40);
+    }
+    
+    doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -99,9 +168,12 @@ export default function ReportsPage() {
             <Calendar className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Derniers 30 jours</span>
           </button>
-          <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 transition-all">
+          <button 
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 transition-all"
+          >
             <Download className="h-4 w-4" />
-            <span>Exporter</span>
+            <span>Exporter CSV</span>
           </button>
         </div>
       </div>
@@ -201,7 +273,10 @@ export default function ReportsPage() {
                 <p className="text-sm text-muted-foreground mb-6 line-clamp-2">{report.description}</p>
                 <div className="flex items-center justify-between pt-4 border-t border-border/50">
                   <span className="text-xs text-muted-foreground font-bold">{report.date}</span>
-                  <button className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-2 group/btn">
+                  <button 
+                    onClick={() => handleDownloadPDF(report.type, report.title)}
+                    className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-2 group/btn"
+                  >
                     <Download className="h-4 w-4 group-hover/btn:translate-y-0.5 transition-transform" />
                     Télécharger PDF
                   </button>
