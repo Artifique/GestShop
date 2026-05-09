@@ -1,0 +1,100 @@
+[browser] ./app/dashboard/customers/page.tsx:149:1
+Expression expected
+  147 | }
+  148 |
+> 149 | }
+      | ^
+  150 |
+  151 | }
+  152 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/customers/page.tsx [Client Component Browser]
+    ./app/dashboard/customers/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/customers/page.tsx [Client Component SSR]
+    ./app/dashboard/customers/page.tsx [Server Component]
+[browser] ./app/dashboard/page.tsx:155:1
+Expression expected
+  153 |   );
+  154 | }
+> 155 | } );
+      | ^
+  156 | };
+  157 | };
+  158 | }};
+
+Parsing ecmascript source code failed
+[browser] ./app/dashboard/products/page.tsx:306:3
+Expression expected
+  304 |   );
+  305 | }
+> 306 |   );
+      |   ^
+  307 | }
+
+Parsing ecmascript source code failed
+[browser] ./app/dashboard/customers/page.tsx:149:1
+Expression expected
+  147 | }
+  148 |
+> 149 | }
+      | ^
+  150 |
+  151 | }
+  152 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/customers/page.tsx [Client Component Browser]
+    ./app/dashboard/customers/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/customers/page.tsx [Client Component SSR]
+    ./app/dashboard/customers/page.tsx [Server Component]
+[browser] ./app/dashboard/page.tsx:155:1
+Expression expected
+  153 |   );
+  154 | }
+> 155 | } );
+      | ^
+  156 | };
+  157 | };
+  158 | }};
+
+Parsing ecmascript source code failed
+[browser] ./app/dashboard/products/page.tsx:306:3
+Expression expected
+  304 |   );
+  305 | }
+> 306 |   );
+      |   ^
+  307 | }
+
+Parsing ecmascript source code failed
+[browser] ./app/dashboard/customers/page.tsx:149:1
+Expression expected
+  147 | }
+  148 |
+> 149 | }
+      | ^
+  150 |
+  151 | }
+  152 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/customers/page.tsx [Client Component Browser]
+    ./app/dashboard/customers/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/customers/page.tsx [Client Component SSR]
+    ./app/dashboard/customers/page.tsx [Server Component]
