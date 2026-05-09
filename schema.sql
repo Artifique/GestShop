@@ -99,7 +99,73 @@ CREATE POLICY "Enable all for authenticated users" ON sales FOR ALL USING (auth.
 CREATE POLICY "Enable all for authenticated users" ON sale_items FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON settings FOR ALL USING (auth.role() = 'authenticated');
 
--- 5. INITIAL DATA (Admin profile will be created via Supabase Auth)
+-- 5. INITIAL DATA
 INSERT INTO settings (id, shop_name, contact_email, currency, timezone)
 VALUES (1, 'GestShop Boutique', 'contact@gestshop.com', 'EUR', 'UTC+1')
 ON CONFLICT (id) DO NOTHING;
+
+-- 6. AUTH & TRIGGERS
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Trigger for automatic profile creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, role)
+  VALUES (
+    new.id, 
+    COALESCE(new.raw_user_meta_data->>'full_name', 'Utilisateur'), 
+    COALESCE((new.raw_user_meta_data->>'role')::user_role, 'manager'::user_role)
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Recreate trigger
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- 7. DEFAULT ADMIN (admin@tonomi.com / Admin123!)
+-- This part creates the user in auth.users and the trigger handles the profile.
+DO $$
+DECLARE
+  new_user_id UUID := gen_random_uuid();
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'admin@tonomi.com') THEN
+    INSERT INTO auth.users (
+      instance_id,
+      id,
+      aud,
+      role,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      created_at,
+      updated_at,
+      confirmation_token,
+      email_change,
+      email_change_token_new,
+      recovery_token
+    ) VALUES (
+      '00000000-0000-0000-0000-000000000000',
+      new_user_id,
+      'authenticated',
+      'authenticated',
+      'admin@tonomi.com',
+      crypt('Admin123!', gen_salt('bf')),
+      now(),
+      '{"provider":"email","providers":["email"]}',
+      '{"full_name":"Administrateur Système","role":"admin"}',
+      now(),
+      now(),
+      '',
+      '',
+      '',
+      ''
+    );
+  END IF;
+END $$;

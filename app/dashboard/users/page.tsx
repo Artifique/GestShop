@@ -7,6 +7,7 @@ import { SuccessDialog, DeleteDialog, ErrorDialog } from "@/components/ui/alert-
 import { cn } from "@/lib/utils";
 import { authService } from "@/lib/services/authService";
 import { Profile } from "@/lib/models/types";
+import { createUserAction, deleteUserAction, updateUserRoleAction } from "@/lib/actions/userActions";
 import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
@@ -70,32 +71,62 @@ export default function UsersPage() {
   };
 
   const handleAdd = async () => {
-    setMessage("Veuillez noter que la création d'utilisateur authentifié nécessite une confirmation par email ou une configuration Supabase spécifique.");
-    setShowError(true);
-    // Logic for creating a profile could be added here, but typically we need auth.signUp
+    setLoading(true);
+    const result = await createUserAction(formData);
+    setLoading(false);
+    
+    if (result.success) {
+      setMessage("Utilisateur créé avec succès. Il peut maintenant se connecter.");
+      setShowSuccess(true);
+      setIsAddModalOpen(false);
+      fetchData();
+    } else {
+      setMessage(result.error || "Une erreur est survenue.");
+      setShowError(true);
+    }
   };
 
   const handleEdit = async () => {
     if (selectedUser) {
+      setLoading(true);
+      // Mise à jour du rôle et du nom
+      const result = await updateUserRoleAction(selectedUser.id, formData.role);
+      
+      // On met aussi à jour le profil pour le nom complet
       const success = await authService.updateProfile(selectedUser.id, {
         full_name: formData.full_name,
         role: formData.role
       });
-      if (success) {
+
+      setLoading(false);
+
+      if (result.success && success) {
         setMessage("Profil mis à jour avec succès.");
         setShowSuccess(true);
         setIsEditModalOpen(false);
         fetchData();
+      } else {
+        setMessage(result.error || "Erreur lors de la mise à jour.");
+        setShowError(true);
       }
     }
   };
 
   const handleDelete = async () => {
     if (selectedUser) {
-      // Typically we don't delete auth users easily from client side
-      setMessage("La suppression d'un utilisateur doit être effectuée via la console Supabase pour des raisons de sécurité.");
-      setShowError(true);
-      setIsDeleteModalOpen(false);
+      setLoading(true);
+      const result = await deleteUserAction(selectedUser.id);
+      setLoading(false);
+      
+      if (result.success) {
+        setMessage("Utilisateur supprimé avec succès.");
+        setShowSuccess(true);
+        setIsDeleteModalOpen(false);
+        fetchData();
+      } else {
+        setMessage(result.error || "Erreur lors de la suppression.");
+        setShowError(true);
+      }
     }
   };
 
