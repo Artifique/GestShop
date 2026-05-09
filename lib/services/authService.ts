@@ -1,10 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/lib/models/types";
 
-const supabase = createClient();
-
 export const authService = {
   async getCurrentUser(): Promise<Profile | null> {
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
@@ -19,16 +18,19 @@ export const authService = {
   },
 
   async login(email: string, password: string): Promise<{ success: boolean, error?: string }> {
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { success: false, error: error.message };
     return { success: true };
   },
 
   async logout(): Promise<void> {
+    const supabase = createClient();
     await supabase.auth.signOut();
   },
 
   async getAllProfiles(): Promise<Profile[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
@@ -39,6 +41,7 @@ export const authService = {
   },
 
   async updateProfile(id: string, profile: Partial<Profile>): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("profiles")
       .update(profile)
@@ -48,6 +51,7 @@ export const authService = {
   },
 
   async updatePassword(password: string): Promise<{ success: boolean, error?: string }> {
+    const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ password });
     if (error) return { success: false, error: error.message };
     return { success: true };

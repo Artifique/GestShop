@@ -1,10 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { Category } from "@/lib/models/types";
 
-const supabase = createClient();
-
 export const categoryService = {
   async getAll(): Promise<Category[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("categories")
       .select("*")
@@ -18,6 +17,7 @@ export const categoryService = {
   },
 
   async create(category: Omit<Category, "id" | "created_at">): Promise<Category | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("categories")
       .insert(category)
@@ -32,6 +32,7 @@ export const categoryService = {
   },
 
   async update(id: string, category: Partial<Category>): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("categories")
       .update(category)
@@ -45,6 +46,7 @@ export const categoryService = {
   },
 
   async delete(id: string): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("categories")
       .delete()

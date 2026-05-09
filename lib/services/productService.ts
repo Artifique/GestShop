@@ -1,10 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { Product } from "@/lib/models/types";
 
-const supabase = createClient();
-
 export const productService = {
   async getAll(): Promise<Product[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -18,6 +17,7 @@ export const productService = {
   },
 
   async getById(id: string): Promise<Product | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -29,6 +29,7 @@ export const productService = {
   },
 
   async create(product: Omit<Product, "id" | "created_at" | "updated_at">): Promise<Product | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("products")
       .insert(product)
@@ -43,6 +44,7 @@ export const productService = {
   },
 
   async update(id: string, product: Partial<Product>): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("products")
       .update(product)
@@ -56,6 +58,7 @@ export const productService = {
   },
 
   async delete(id: string): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("products")
       .delete()

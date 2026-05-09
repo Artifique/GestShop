@@ -1,10 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { Sale, SaleItem } from "@/lib/models/types";
 
-const supabase = createClient();
-
 export const saleService = {
   async createSale(sale: Omit<Sale, "id" | "created_at">, items: Omit<SaleItem, "id" | "sale_id">[]): Promise<boolean> {
+    const supabase = createClient();
     // 1. Create the sale
     const { data: saleData, error: saleError } = await supabase
       .from("sales")
@@ -53,6 +52,7 @@ export const saleService = {
   },
 
   async getAll(): Promise<Sale[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("sales")
       .select("*, customers(name)")
@@ -66,6 +66,7 @@ export const saleService = {
   },
 
   async getSaleItems(saleId: string): Promise<SaleItem[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("sale_items")
       .select("*, products(name)")

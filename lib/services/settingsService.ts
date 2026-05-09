@@ -1,10 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 import { ShopSettings } from "@/lib/models/types";
 
-const supabase = createClient();
-
 export const settingsService = {
   async getSettings(): Promise<ShopSettings | null> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("settings")
       .select("*")
@@ -18,6 +17,7 @@ export const settingsService = {
   },
 
   async updateSettings(settings: Partial<ShopSettings>): Promise<boolean> {
+    const supabase = createClient();
     const { error } = await supabase
       .from("settings")
       .upsert({ id: 1, ...settings });
