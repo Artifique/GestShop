@@ -42,16 +42,29 @@ export default function DashboardPage() {
 
       setRecentSales(sales.slice(0, 5));
 
-      // Simple mock for chart based on real sales count if needed, or just keep static for now
-      setChartData([
-        { name: 'Lun', revenue: 4000 },
-        { name: 'Mar', revenue: 3000 },
-        { name: 'Mer', revenue: 9800 },
-        { name: 'Jeu', revenue: 3908 },
-        { name: 'Ven', revenue: 4800 },
-        { name: 'Sam', revenue: 3800 },
-        { name: 'Dim', revenue: 4300 },
-      ]);
+      // Group sales by day of week for the last 7 days
+      const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return {
+          date: d.toISOString().split('T')[0],
+          name: days[d.getDay()],
+          revenue: 0
+        };
+      });
+
+      sales.forEach(sale => {
+        if (sale.created_at) {
+          const saleDate = new Date(sale.created_at).toISOString().split('T')[0];
+          const dayData = last7Days.find(d => d.date === saleDate);
+          if (dayData) {
+            dayData.revenue += sale.total_amount;
+          }
+        }
+      });
+
+      setChartData(last7Days);
       setLoading(false);
     }
     fetchData();

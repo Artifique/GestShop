@@ -8,36 +8,75 @@ import {
   PieChart, Pie, Cell 
 } from 'recharts';
 import { useRouter } from "next/navigation";
+import { saleService } from "@/lib/services/saleService";
 import { authService } from "@/lib/services/authService";
+import { useState, useEffect } from "react";
 
-const data = [
-  { name: 'Lun', sales: 4000, revenue: 2400 },
-  { name: 'Mar', sales: 3000, revenue: 1398 },
-  { name: 'Mer', sales: 2000, revenue: 9800 },
-  { name: 'Jeu', sales: 2780, revenue: 3908 },
-  { name: 'Ven', sales: 1890, revenue: 4800 },
-  { name: 'Sam', sales: 2390, revenue: 3800 },
-  { name: 'Dim', sales: 3490, revenue: 4300 },
-];
-
-const pieData = [
-  { name: 'Vêtements', value: 400 },
-  { name: 'Chaussures', value: 300 },
-  { name: 'Accessoires', value: 300 },
-];
-
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28'];
 
 export default function ReportsPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function checkAccess() {
       const p = await authService.getCurrentUser();
       if (p?.role !== 'admin') {
         router.push("/dashboard");
+        return;
       }
+      fetchReportData();
     }
+
+    async function fetchReportData() {
+      setLoading(true);
+      const sales = await saleService.getDashboardStats();
+      if (!sales) return;
+
+      // 1. Weekly Revenue Data
+      const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return {
+          date: d.toISOString().split('T')[0],
+          name: days[d.getDay()],
+          revenue: 0
+        };
+      });
+
+      sales.forEach(sale => {
+        if (sale.created_at) {
+          const saleDate = new Date(sale.created_at).toISOString().split('T')[0];
+          const dayData = last7Days.find(d => d.date === saleDate);
+          if (dayData) {
+            dayData.revenue += sale.total_amount;
+          }
+        }
+      });
+      setWeeklyData(last7Days);
+
+      // 2. Category Distribution Data
+      const catMap: Record<string, number> = {};
+      sales.forEach(sale => {
+        sale.sale_items?.forEach((item: any) => {
+          const catName = item.products?.categories?.name || 'Inconnu';
+          const itemTotal = item.quantity * item.unit_price;
+          catMap[catName] = (catMap[catName] || 0) + itemTotal;
+        });
+      });
+
+      const formattedCatData = Object.entries(catMap).map(([name, value]) => ({
+        name,
+        value
+      }));
+      setCategoryData(formattedCatData.sort((a, b) => b.value - a.value));
+
+      setLoading(false);
+    }
+
     checkAccess();
   }, []);
 
@@ -78,7 +117,7 @@ export default function ReportsPage() {
            </div>
            <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
+                <AreaChart data={weeklyData}>
                   <defs>
                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
@@ -107,7 +146,7 @@ export default function ReportsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={pieData}
+                  data={categoryData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -116,7 +155,7 @@ export default function ReportsPage() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {pieData.map((entry, index) => (
+                  {categoryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -126,16 +165,19 @@ export default function ReportsPage() {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 space-y-3 w-full">
-            {pieData.map((cat, i) => (
+          <div className="mt-4 space-y-3 w-full overflow-y-auto max-h-[150px] pr-2 custom-scrollbar">
+            {categoryData.map((cat, i) => (
               <div key={i} className="flex justify-between text-sm items-center p-2 rounded-xl hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="h-3 w-3 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}} />
                   <span className="text-muted-foreground font-medium">{cat.name}</span>
                 </div>
-                <span className="text-foreground font-bold">{cat.value} €</span>
+                <span className="text-foreground font-bold">{cat.value.toFixed(2)} €</span>
               </div>
             ))}
+            {categoryData.length === 0 && (
+              <p className="text-center text-muted-foreground text-xs italic py-4">Aucune donnée.</p>
+            )}
           </div>
         </div>
       </div>

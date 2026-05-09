@@ -77,5 +77,16 @@ export const saleService = {
       return [];
     }
     return data || [];
+  },
+
+  async getDashboardStats() {
+    const supabase = createClient();
+    const { data: sales, error } = await supabase
+      .from("sales")
+      .select("*, sale_items(*, products(*, categories(*)))")
+      .order("created_at", { ascending: false });
+
+    if (error) return null;
+    return sales;
   }
 };
