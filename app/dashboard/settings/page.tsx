@@ -56,7 +56,7 @@ export default function SettingsPage() {
         setCurrentUser(pData);
         setProfileForm({ full_name: pData.full_name || "" });
         if (pData.preferences?.notifications) {
-          setNotifications(pData.preferences.notifications);
+          setNotifications(pData.preferences.notifications as typeof notifications);
         }
         if (pData.role !== 'admin') {
           setActiveTab("profile");
@@ -275,7 +275,7 @@ export default function SettingsPage() {
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Nom d'utilisateur</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Nom d&apos;utilisateur</label>
                     <input 
                       value={profileForm.full_name}
                       onChange={e => setProfileForm({...profileForm, full_name: e.target.value})}
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Langue d'interface</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Langue d&apos;interface</label>
                     <select 
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all appearance-none font-bold"
                     >
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                      <div className="flex-1 space-y-2">
                         <p className="font-bold text-foreground">Sécurisez votre compte davantage</p>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                           L'authentification à deux facteurs ajoute une couche de sécurité supplémentaire à votre compte en exigeant plus qu'un simple mot de passe pour se connecter.
+                           L&apos;authentification à deux facteurs ajoute une couche de sécurité supplémentaire à votre compte en exigeant plus qu&apos;un simple mot de passe pour se connecter.
                         </p>
                         <button className="mt-2 text-xs font-black text-amber-600 uppercase tracking-widest hover:underline">
                            Activer maintenant

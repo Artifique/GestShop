@@ -2,8 +2,10 @@ import { pdf } from "@react-pdf/renderer";
 import { ReceiptPDF } from "../components/ReceiptPDF";
 import { createClient } from "@/lib/supabase/server";
 
+import { Sale } from "@/lib/models/types";
+
 export const ReceiptService = {
-  async generateAndUpload(sale: any) {
+  async generateAndUpload(sale: Sale) {
     const supabase = await createClient();
 
     // 1. Génération du PDF en buffer

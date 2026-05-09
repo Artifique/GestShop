@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, ErrorDialog } from "@/components/ui/alert-dialog";
 import { Plus, ShoppingCart, Search, Trash2, CreditCard, User, Package, Minus } from "lucide-react";
@@ -30,21 +30,22 @@ export default function PosPage() {
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const [prods, custs, user] = await Promise.all([
-        productService.getAll(),
-        customerService.getAll(),
-        authService.getCurrentUser()
-      ]);
-      setProducts(prods);
-      setCustomers(custs);
-      setCurrentUser(user);
-      setLoading(false);
-    }
-    fetchData();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const [prods, custs, user] = await Promise.all([
+      productService.getAll(),
+      customerService.getAll(),
+      authService.getCurrentUser()
+    ]);
+    setProducts(prods);
+    setCustomers(custs);
+    setCurrentUser(user);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const addToCart = (product: Product) => {
     const existing = cart.find(item => item.id === product.id);

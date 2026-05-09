@@ -73,7 +73,7 @@ export default function ReportsPage() {
            <div className="flex items-center justify-between mb-8">
              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                <TrendingUp className="h-5 w-5 text-emerald-500" />
-               Chiffre d'Affaires Hebdomadaire
+               Chiffre d&apos;Affaires Hebdomadaire
              </h3>
            </div>
            <div className="h-[300px] w-full">

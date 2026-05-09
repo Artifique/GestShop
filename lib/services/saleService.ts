@@ -65,7 +65,7 @@ export const saleService = {
     return data || [];
   },
 
-  async getSaleItems(saleId: string): Promise<any[]> {
+  async getSaleItems(saleId: string): Promise<SaleItem[]> {
     const { data, error } = await supabase
       .from("sale_items")
       .select("*, products(name)")

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Search, Tag, Edit2, Trash2, Layers } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, ErrorDialog, DeleteDialog } from "@/components/ui/alert-dialog";
@@ -21,16 +21,16 @@ export default function CategoriesPage() {
 
   const [formData, setFormData] = useState({ name: "", description: "" });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const data = await categoryService.getAll();
     setCategories(data);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const filteredCategories = categories.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -168,7 +168,7 @@ export default function CategoriesPage() {
   );
 }
 
-function CategoryForm({ formData, setFormData }: { formData: any, setFormData: any }) {
+function CategoryForm({ formData, setFormData }: { formData: { name: string; description: string }, setFormData: (d: any) => void }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-2">

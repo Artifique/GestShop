@@ -206,7 +206,7 @@ export function SuccessDialog({ open, onOpenChange, message }: { open: boolean; 
             <CheckCircle className="h-10 w-10 text-emerald-500" />
           </div>
         </div>
-        <p className="text-center text-muted-foreground font-medium px-4">L'opération s'est déroulée sans encombre.</p>
+        <p className="text-center text-muted-foreground font-medium px-4">L&apos;opération s&apos;est déroulée sans encombre.</p>
       </div>
     </Modal>
   );
@@ -256,7 +256,7 @@ export function DeleteDialog({ open, onOpenChange, onConfirm, title, itemName }:
         <div className="text-center space-y-1 px-4">
           <p className="text-foreground font-black text-lg">Êtes-vous sûr ?</p>
           <p className="text-muted-foreground font-medium">
-            Vous êtes sur le point de supprimer <span className="text-rose-500 font-bold">"{itemName}"</span>.
+            Vous êtes sur le point de supprimer <span className="text-rose-500 font-bold">&quot;{itemName}&quot;</span>.
           </p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-rose-500/5 rounded-xl border border-rose-500/10 text-[10px] font-black text-rose-500 uppercase tracking-widest">

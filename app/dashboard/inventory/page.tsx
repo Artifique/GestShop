@@ -242,13 +242,13 @@ export default function InventoryPage() {
             />
           </div>
           <div className="grid gap-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Motif de l'ajustement</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Motif de l&apos;ajustement</label>
             <select className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold appearance-none">
               <option>Inventaire cyclique</option>
               <option>Réception de commande</option>
               <option>Retour client</option>
               <option>Perte / Vol</option>
-              <option>Correction d'erreur</option>
+              <option>Correction d&apos;erreur</option>
             </select>
           </div>
         </div>

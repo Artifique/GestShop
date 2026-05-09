@@ -5,7 +5,7 @@ export interface Profile {
   full_name: string;
   role: UserRole;
   avatar_url?: string;
-  preferences?: any;
+  preferences?: Record<string, unknown>;
   created_at?: string;
   last_login?: string;
 }
@@ -47,7 +47,13 @@ export interface Sale {
   seller_id: string;
   total_amount: number;
   payment_method: string;
+  receipt_number?: string;
   created_at?: string;
+  customers?: { name: string };
+}
+
+export interface SaleWithDetails extends Sale {
+  customers?: { name: string };
 }
 
 export interface SaleItem {
@@ -56,6 +62,7 @@ export interface SaleItem {
   product_id: string;
   quantity: number;
   unit_price: number;
+  products?: { name: string };
 }
 
 export interface ShopSettings {

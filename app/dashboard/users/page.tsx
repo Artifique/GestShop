@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Search, User, Shield, Mail, Key, Trash2, Edit2, CheckCircle2 } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, DeleteDialog, ErrorDialog } from "@/components/ui/alert-dialog";
@@ -22,19 +22,24 @@ export default function UsersPage() {
   const [showError, setShowError] = useState(false);
   const [message, setMessage] = useState("");
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    full_name: string;
+    email: string;
+    role: "admin" | "manager";
+    password?: string;
+  }>({
     full_name: "",
-    email: "", // Used for search or reference
-    role: "manager" as "admin" | "manager",
+    email: "",
+    role: "manager",
     password: ""
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const profiles = await authService.getAllProfiles();
     setUsers(profiles);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     async function checkAccess() {
@@ -46,7 +51,7 @@ export default function UsersPage() {
       }
     }
     checkAccess();
-  }, []);
+  }, [router, fetchData]);
 
   const handleOpenAdd = () => {
     setFormData({ full_name: "", email: "", role: "manager", password: "" });
@@ -55,7 +60,7 @@ export default function UsersPage() {
 
   const handleOpenEdit = (user: Profile) => {
     setSelectedUser(user);
-    setFormData({ full_name: user.full_name || "", email: "", role: user.role as any, password: "" });
+    setFormData({ full_name: user.full_name || "", email: "", role: user.role, password: "" });
     setIsEditModalOpen(true);
   };
 
@@ -208,7 +213,11 @@ export default function UsersPage() {
   );
 }
 
-function UserForm({ data, onChange, isEdit = false }: { data: any, onChange: (d: any) => void, isEdit?: boolean }) {
+function UserForm({ data, onChange, isEdit = false }: { 
+  data: { full_name: string; email: string; role: "admin" | "manager"; password?: string }; 
+  onChange: (d: any) => void; 
+  isEdit?: boolean 
+}) {
   return (
     <div className="space-y-6">
       <div className="grid gap-2">

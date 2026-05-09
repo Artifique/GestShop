@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Search, User, Mail, Phone, MapPin, Edit2, Trash2, Filter } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, ErrorDialog, DeleteDialog } from "@/components/ui/alert-dialog";
@@ -26,16 +26,16 @@ export default function CustomersPage() {
     address: ""
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const data = await customerService.getAll();
     setCustomers(data);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -286,7 +286,7 @@ export default function CustomersPage() {
   );
 }
 
-function CustomerForm({ data, onChange }: { data: any, onChange: (d: any) => void }) {
+function CustomerForm({ data, onChange }: { data: { name: string; email: string; phone: string; address: string }, onChange: (d: any) => void }) {
   return (
     <div className="space-y-6">
        <div className="grid gap-2">

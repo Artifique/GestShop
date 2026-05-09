@@ -6,14 +6,14 @@ import { SuccessDialog, ErrorDialog } from "@/components/ui/alert-dialog";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 import { saleService } from "@/lib/services/saleService";
-import { Sale } from "@/lib/models/types";
+import { Sale, SaleItem } from "@/lib/models/types";
 
 export default function SalesPage() {
-  const [sales, setSales] = useState<any[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSale, setSelectedSale] = useState<any | null>(null);
-  const [saleItems, setSaleItems] = useState<any[]>([]);
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const fetchData = async () => {
@@ -27,7 +27,7 @@ export default function SalesPage() {
     fetchData();
   }, []);
 
-  const handleOpenDetails = async (sale: any) => {
+  const handleOpenDetails = async (sale: Sale) => {
     setSelectedSale(sale);
     setIsDetailsOpen(true);
     const items = await saleService.getSaleItems(sale.id);
@@ -107,7 +107,7 @@ export default function SalesPage() {
                     </div>
                   </td>
                   <td className="px-6 py-5 text-center text-muted-foreground text-sm font-medium">
-                    {new Date(sale.created_at).toLocaleString()}
+                    {sale.created_at ? new Date(sale.created_at).toLocaleString() : "N/A"}
                   </td>
                   <td className="px-6 py-5 text-right font-black text-foreground text-lg">{sale.total_amount.toFixed(2)} €</td>
                   <td className="px-6 py-5 text-center">
