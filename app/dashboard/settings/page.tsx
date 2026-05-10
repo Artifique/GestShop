@@ -289,10 +289,9 @@ export default function SettingsPage() {
                       onChange={e => setShopSettings({...shopSettings, currency: e.target.value})}
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all appearance-none font-bold"
                     >
-                      <option value="XOF">FCFA (XOF)</option>
-                      <option value="EUR">Euro (FCFA)</option>
+                      <option value="XOF">FCFA - Franc CFA (XOF)</option>
+                      <option value="EUR">Euro (€)</option>
                       <option value="USD">Dollar ($)</option>
-                      <option value="CFA">Franc CFA (FCFA)</option>
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -302,10 +301,13 @@ export default function SettingsPage() {
                       onChange={e => setShopSettings({...shopSettings, timezone: e.target.value})}
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all appearance-none font-bold"
                     >
-                      <option value="UTC">UTC (Londres)</option>
-                      <option value="UTC">UTC (Bamako)</option>
-                      <option value="UTC+1">UTC+1 (Paris)</option>
-                      <option value="UTC+3">UTC+3 (Dubaï)</option>
+                      <option value="Africa/Bamako">Bamako, Mali (UTC+0)</option>
+                      <option value="Africa/Dakar">Dakar, Sénégal (UTC+0)</option>
+                      <option value="Africa/Abidjan">Abidjan, Côte d&apos;Ivoire (UTC+0)</option>
+                      <option value="Africa/Lagos">Lagos, Nigeria (UTC+1)</option>
+                      <option value="Africa/Casablanca">Casablanca, Maroc (UTC+1)</option>
+                      <option value="Europe/Paris">Paris, France (UTC+1)</option>
+                      <option value="UTC">UTC (Temps Universel)</option>
                     </select>
                   </div>
                 </div>
