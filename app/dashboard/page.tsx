@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export default function DashboardPage() {
   const stats = [
     {
       title: "Revenu Total",
-      value: `${statsData.revenue.toFixed(2)} €`,
+      value: `${statsData.revenue.toFixed(2)} FCFA`,
       change: "+12.5%",
       trend: "up",
       icon: DollarSign,
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-primary">+{sale.total_amount.toFixed(2)} €</p>
+                  <p className="text-sm font-black text-primary">+{sale.total_amount.toFixed(2)} FCFA</p>
                   <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Payé</p>
                 </div>
               </div>

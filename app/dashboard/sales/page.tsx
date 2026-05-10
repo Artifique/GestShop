@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Search, History, Filter, Download, Eye, FileText, Calendar, Package } from "lucide-react";
@@ -109,7 +109,7 @@ export default function SalesPage() {
                   <td className="px-6 py-5 text-center text-muted-foreground text-sm font-medium">
                     {sale.created_at ? new Date(sale.created_at).toLocaleString() : "N/A"}
                   </td>
-                  <td className="px-6 py-5 text-right font-black text-foreground text-lg">{sale.total_amount.toFixed(2)} €</td>
+                  <td className="px-6 py-5 text-right font-black text-foreground text-lg">{sale.total_amount.toFixed(2)} FCFA</td>
                   <td className="px-6 py-5 text-center">
                     <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border bg-secondary/50 text-muted-foreground border-border/50">
                       {sale.payment_method === 'cash' ? 'Espèces' : 'Carte'}
@@ -195,7 +195,7 @@ export default function SalesPage() {
                         <p className="text-[10px] text-muted-foreground font-bold">Qté: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="text-sm font-black text-foreground">{(item.unit_price * item.quantity).toFixed(2)} €</p>
+                    <p className="text-sm font-black text-foreground">{(item.unit_price * item.quantity).toFixed(2)} FCFA</p>
                   </div>
                 ))}
               </div>
@@ -204,7 +204,7 @@ export default function SalesPage() {
             <div className="p-4 bg-secondary rounded-2xl border border-border">
               <div className="flex justify-between items-center pt-2">
                 <span className="text-lg font-bold text-foreground">Total</span>
-                <span className="text-xl font-bold text-primary">{selectedSale.total_amount.toFixed(2)} €</span>
+                <span className="text-xl font-bold text-primary">{selectedSale.total_amount.toFixed(2)} FCFA</span>
               </div>
             </div>
           </div>

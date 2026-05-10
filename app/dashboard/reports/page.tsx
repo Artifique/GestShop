@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { BarChart3, PieChart as PieChartIcon, TrendingUp, Calendar, Download, Filter, FileText } from "lucide-react";
@@ -132,7 +132,7 @@ export default function ReportsPage() {
          const tableRows = allSales.map(s => [
            new Date(s.created_at).toLocaleDateString(),
            s.customers?.name || "Client de passage",
-           `${s.total_amount.toFixed(2)} €`,
+           `${s.total_amount.toFixed(2)} FCFA`,
            s.payment_method
          ]);
          autoTable(doc, { head: [tableColumn], body: tableRows, startY: 35 });
@@ -140,7 +140,7 @@ export default function ReportsPage() {
          const prods = await productService.getAll();
          const tableColumn = ["Produit", "SKU", "Stock", "Prix"];
          const tableRows = prods.map(p => [
-           p.name, p.sku, p.stock.toString(), `${p.price.toFixed(2)} €`
+           p.name, p.sku, p.stock.toString(), `${p.price.toFixed(2)} FCFA`
          ]);
          autoTable(doc, { head: [tableColumn], body: tableRows, startY: 35 });
       } else if (reportType === "Clients") {
@@ -249,7 +249,7 @@ export default function ReportsPage() {
                   <div className="h-3 w-3 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}} />
                   <span className="text-muted-foreground font-medium">{cat.name}</span>
                 </div>
-                <span className="text-foreground font-bold">{cat.value.toFixed(2)} €</span>
+                <span className="text-foreground font-bold">{cat.value.toFixed(2)} FCFA</span>
               </div>
             ))}
             {categoryData.length === 0 && (

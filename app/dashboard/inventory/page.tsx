@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Search, Box, ArrowUpRight, AlertTriangle, Filter, RefreshCw, Plus } from "lucide-react";
@@ -101,7 +101,7 @@ export default function InventoryPage() {
         {[
           { label: "Total Références", value: stats.totalItems, icon: Box, color: "text-blue-500", bg: "bg-blue-500/10" },
           { label: "Alertes Stock", value: stats.lowStock + stats.outOfStock, icon: AlertTriangle, color: "text-rose-500", bg: "bg-rose-500/10" },
-          { label: "Valeur du stock", value: `${stats.totalValue.toFixed(2)} €`, icon: ArrowUpRight, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+          { label: "Valeur du stock", value: `${stats.totalValue.toFixed(2)} FCFA`, icon: ArrowUpRight, color: "text-emerald-500", bg: "bg-emerald-500/10" },
         ].map((stat, i) => (
           <div key={i} className="glass-card rounded-[28px] p-6 group hover:translate-y-[-4px] transition-all">
             <div className="flex items-center gap-4">

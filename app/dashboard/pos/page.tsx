@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal } from "@/components/ui/modal";
@@ -274,7 +274,7 @@ export default function PosPage() {
                     <div className="flex flex-col">
                       <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-0.5">Prix</span>
                       <span className="text-xl font-black text-foreground tracking-tighter">
-                        {product.price.toFixed(2)} <span className="text-primary text-sm font-bold">€</span>
+                        {product.price.toFixed(2)} <span className="text-primary text-sm font-bold">FCFA</span>
                       </span>
                     </div>
                   </div>
@@ -320,7 +320,7 @@ export default function PosPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-foreground text-xs truncate">{item.name}</h4>
-                  <p className="text-primary font-black text-xs">{item.price.toFixed(2)} €</p>
+                  <p className="text-primary font-black text-xs">{item.price.toFixed(2)} FCFA</p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => updateQuantity(item.id, -1)} className="p-1 rounded-lg bg-muted hover:bg-border transition-colors">
@@ -365,7 +365,7 @@ export default function PosPage() {
 
             <div className="flex justify-between items-end">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pb-1">Total à payer</span>
-              <span className="text-3xl font-black text-primary tracking-tighter">{total.toFixed(2)} €</span>
+              <span className="text-3xl font-black text-primary tracking-tighter">{total.toFixed(2)} FCFA</span>
             </div>
             
             <button 

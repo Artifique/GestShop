@@ -255,7 +255,7 @@ function UserForm({ data, onChange, isEdit = false }: {
         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Nom Complet</label>
         <input 
           className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
-          placeholder="Ex: Jean Dupont" 
+          placeholder="Ex: Mamadou Traoré" 
           value={data.full_name} onChange={e => onChange({...data, full_name: e.target.value})}
         />
       </div>
@@ -275,7 +275,7 @@ function UserForm({ data, onChange, isEdit = false }: {
             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Email professionnel</label>
             <input 
               className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
-              placeholder="Ex: jean@boutique.com" 
+              placeholder="Ex: mamadou@gestshop.ml" 
               value={data.email} onChange={e => onChange({...data, email: e.target.value})}
             />
           </div>

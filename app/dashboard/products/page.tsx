@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Plus, Search, Edit2, Trash2, Package, Filter, Download } from "lucide-react";
@@ -33,6 +33,9 @@ export default function ProductsPage() {
     description: ""
   });
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(false);
+
   const fetchData = async () => {
     setLoading(true);
     const [prods, cats] = await Promise.all([
@@ -46,15 +49,25 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchData();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      if (cat) {
+        setSelectedCategoryId(cat);
+        setShowFilters(true);
+      }
+    }
   }, []);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.sku.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategoryId ? p.category_id === selectedCategoryId : true;
+    return matchesSearch && matchesCategory;
+  });
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = filteredProducts.slice(
@@ -185,10 +198,30 @@ export default function ProductsPage() {
             }}
           />
         </div>
-        <button className="flex items-center gap-2 px-5 h-12 rounded-2xl bg-card border border-border text-foreground hover:bg-muted transition-all shadow-sm w-full md:w-auto">
-          <Filter className="h-5 w-5 text-primary" />
-          <span className="font-bold">Filtres</span>
-        </button>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          {showFilters && (
+            <select 
+              value={selectedCategoryId}
+              onChange={(e) => { setSelectedCategoryId(e.target.value); setCurrentPage(1); }}
+              className="h-12 px-4 rounded-2xl bg-card border border-border text-foreground shadow-sm font-medium outline-none focus:border-primary transition-all animate-in fade-in slide-in-from-right-4"
+            >
+              <option value="">Toutes les catégories</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={cn(
+              "flex items-center gap-2 px-5 h-12 rounded-2xl border transition-all shadow-sm w-full md:w-auto",
+              showFilters ? "bg-primary border-primary text-primary-foreground" : "bg-card border-border text-foreground hover:bg-muted"
+            )}
+          >
+            <Filter className={cn("h-5 w-5", showFilters ? "text-primary-foreground" : "text-primary")} />
+            <span className="font-bold">Filtres</span>
+          </button>
+        </div>
       </div>
 
       <div className="glass-card rounded-[32px] overflow-hidden flex flex-col">
@@ -225,7 +258,7 @@ export default function ProductsPage() {
                   <td className="px-6 py-5 text-center text-[10px] font-black uppercase tracking-widest">
                       {categories.find(c => c.id === product.category_id)?.name || "Non classé"}
                   </td>
-                  <td className="px-6 py-5 text-right text-foreground font-black text-lg">{product.price.toFixed(2)} €</td>
+                  <td className="px-6 py-5 text-right text-foreground font-black text-lg">{product.price.toFixed(2)} FCFA</td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
                       <button 
@@ -344,7 +377,7 @@ function ProductForm({ data, onChange, categories }: { data: any, onChange: (d: 
           />
         </div>
         <div className="grid gap-2">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Prix de Vente (€)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Prix de Vente (FCFA)</label>
           <input 
             type="number"
             placeholder="0.00"

@@ -192,7 +192,8 @@ export default function SettingsPage() {
                       onChange={e => setShopSettings({...shopSettings, currency: e.target.value})}
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all appearance-none font-bold"
                     >
-                      <option value="EUR">Euro (€)</option>
+                      <option value="XOF">FCFA (XOF)</option>
+                      <option value="EUR">Euro (FCFA)</option>
                       <option value="USD">Dollar ($)</option>
                       <option value="CFA">Franc CFA (FCFA)</option>
                     </select>
@@ -205,6 +206,7 @@ export default function SettingsPage() {
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all appearance-none font-bold"
                     >
                       <option value="UTC">UTC (Londres)</option>
+                      <option value="UTC">UTC (Bamako)</option>
                       <option value="UTC+1">UTC+1 (Paris)</option>
                       <option value="UTC+3">UTC+3 (Dubaï)</option>
                     </select>

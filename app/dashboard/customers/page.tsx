@@ -187,7 +187,7 @@ export default function CustomersPage() {
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex flex-col items-end">
-                      <span className="text-lg font-black text-primary">{customer.total_spent.toFixed(2)} €</span>
+                      <span className="text-lg font-black text-primary">{customer.total_spent.toFixed(2)} FCFA</span>
                       <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Dernier : {customer.last_order ? new Date(customer.last_order).toLocaleDateString() : "Jamais"}</span>
                     </div>
                   </td>
@@ -293,7 +293,7 @@ function CustomerForm({ data, onChange }: { data: { name: string; email: string;
          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Nom complet</label>
          <input 
            className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
-           placeholder="Ex: Jean Dupont" 
+          placeholder="Ex: Amadou Diallo" 
            value={data.name} onChange={e => onChange({...data, name: e.target.value})}
          />
        </div>
@@ -302,7 +302,7 @@ function CustomerForm({ data, onChange }: { data: { name: string; email: string;
            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Email</label>
            <input 
              className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
-             placeholder="jean@email.com" 
+             placeholder="amadou@gmail.com" 
              value={data.email} onChange={e => onChange({...data, email: e.target.value})}
            />
          </div>
@@ -319,7 +319,7 @@ function CustomerForm({ data, onChange }: { data: { name: string; email: string;
          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Adresse physique</label>
          <input 
            className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
-           placeholder="123 Rue de la Boutique, Paris" 
+          placeholder="Ex: ACI 2000, Bamako" 
            value={data.address} onChange={e => onChange({...data, address: e.target.value})}
          />
        </div>
