@@ -33,23 +33,11 @@ export const settingsService = {
   async updateSettings(settings: Partial<ShopSettings>): Promise<boolean> {
     const supabase = createClient();
 
-    // Exclude logo_url from main upsert if column doesn't exist, handle separately
-    const { logo_url, updated_at, ...rest } = settings as any;
-
-    // First, try to upsert without logo_url (core fields only)
-    const payload: any = {
-      id: 1,
-      shop_name: rest.shop_name,
-      contact_email: rest.contact_email,
-      currency: rest.currency,
-      timezone: rest.timezone,
-      updated_at: new Date().toISOString()
+    const payload = {
+      id: 1, // Assurez-vous que la bonne ligne est mise à jour
+      ...settings, // Incluez tous les paramètres fournis
+      updated_at: new Date().toISOString() // Mettez à jour explicitement l'horodatage
     };
-
-    // Only include logo_url if it's explicitly provided
-    if (logo_url !== undefined) {
-      payload.logo_url = logo_url;
-    }
 
     const { error } = await supabase
       .from("settings")
@@ -62,22 +50,6 @@ export const settingsService = {
       console.error("Détails:", error.details);
       console.error("Hint:", error.hint);
       console.error("==========================================");
-
-      // If the error is about logo_url column not existing, retry without it
-      if (error.message?.includes("logo_url") || error.code === "42703") {
-        console.warn("Colonne logo_url non trouvée. Nouvelle tentative sans logo_url...");
-        const { logo_url: _, ...payloadWithoutLogo } = payload;
-        const { error: error2 } = await supabase
-          .from("settings")
-          .upsert(payloadWithoutLogo);
-        
-        if (error2) {
-          console.error("Échec de la 2ème tentative:", error2.message);
-          return false;
-        }
-        return true;
-      }
-
       return false;
     }
     return true;
