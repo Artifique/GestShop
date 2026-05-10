@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, Search, User, Shield, Mail, Key, Trash2, Edit2, CheckCircle2 } from "lucide-react";
+import { Plus, Search, User, Shield, Mail, Key, Trash2, Edit2, CheckCircle2, Eye, EyeOff, Power, PowerOff } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, DeleteDialog, ErrorDialog } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { authService } from "@/lib/services/authService";
 import { Profile } from "@/lib/models/types";
-import { createUserAction, deleteUserAction, updateUserRoleAction, getAllUsersWithEmails } from "@/lib/actions/userActions";
+import { createUserAction, deleteUserAction, updateUserRoleAction, getAllUsersWithEmails, toggleUserStatusAction } from "@/lib/actions/userActions";
 import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
@@ -136,6 +136,22 @@ export default function UsersPage() {
     }
   };
 
+  const handleToggleStatus = async (user: any) => {
+    setLoading(true);
+    const newStatus = !user.is_active;
+    const result = await toggleUserStatusAction(user.id, newStatus);
+    setLoading(false);
+    
+    if (result.success) {
+      setMessage(`Utilisateur ${newStatus ? 'activé' : 'désactivé'} avec succès.`);
+      setShowSuccess(true);
+      fetchData();
+    } else {
+      setMessage(result.error || "Erreur lors de la modification du statut.");
+      setShowError(true);
+    }
+  };
+
   const filteredUsers = users.filter(u => 
     (u.full_name || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -182,12 +198,22 @@ export default function UsersPage() {
               )}>
                 <User className="h-7 w-7" />
               </div>
-              <span className={cn(
-                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                user.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"
-              )}>
-                {user.role === 'admin' ? 'Administrateur' : 'Gérant'}
-              </span>
+              <div className="flex flex-col items-end gap-2">
+                <span className={cn(
+                  "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                  user.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                )}>
+                  {user.role === 'admin' ? 'Administrateur' : 'Gérant'}
+                </span>
+                {user.is_active !== undefined && (
+                  <span className={cn(
+                    "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                    user.is_active ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                  )}>
+                    {user.is_active ? 'Actif' : 'Désactivé'}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4 mb-8">
@@ -210,6 +236,9 @@ export default function UsersPage() {
                 Réinitialiser MDP
               </button>
               <div className="flex gap-2">
+                <button onClick={() => handleToggleStatus(user)} className={cn("p-2 rounded-lg bg-secondary transition-colors", user.is_active ? "hover:bg-amber-500/20 text-muted-foreground hover:text-amber-500" : "hover:bg-emerald-500/20 text-muted-foreground hover:text-emerald-500")} title={user.is_active ? "Désactiver le compte" : "Activer le compte"}>
+                  {user.is_active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                </button>
                 <button onClick={() => handleOpenEdit(user)} className="p-2 rounded-lg bg-secondary hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors">
                   <Edit2 className="h-4 w-4" />
                 </button>
@@ -255,6 +284,8 @@ function UserForm({ data, onChange, isEdit = false }: {
   onChange: (d: any) => void; 
   isEdit?: boolean 
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  
   return (
     <div className="space-y-6">
       <div className="grid gap-2">
@@ -290,10 +321,17 @@ function UserForm({ data, onChange, isEdit = false }: {
             <div className="relative group">
               <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input 
-                type="password" 
-                className="w-full h-12 pl-12 pr-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
+                type={showPassword ? "text" : "password"} 
+                className="w-full h-12 pl-12 pr-12 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-bold" 
                 value={data.password} onChange={e => onChange({...data, password: e.target.value})}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-3.5 text-zinc-500 hover:text-primary transition-colors focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </>

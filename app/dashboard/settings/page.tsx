@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Settings, User, Bell, Shield, Globe, CreditCard, Save, RefreshCw, Loader2 } from "lucide-react";
+import { Settings, User, Bell, Shield, Globe, CreditCard, Save, RefreshCw, Loader2, Eye, EyeOff } from "lucide-react";
 import { SuccessDialog } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/app/theme-provider";
@@ -15,6 +15,9 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { theme, setTheme } = useTheme();
 
   const [shopSettings, setShopSettings] = useState<ShopSettings>({
@@ -359,35 +362,56 @@ export default function SettingsPage() {
                     Modifier le mot de passe
                   </h2>
                   <div className="grid grid-cols-1 gap-6 max-w-md">
-                     <div className="space-y-2">
+                     <div className="space-y-2 relative group">
                         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Mot de passe actuel</label>
                         <input 
-                          type="password" 
+                          type={showCurrentPassword ? "text" : "password"} 
                           placeholder="••••••••" 
                           value={securityForm.currentPassword}
                           onChange={e => setSecurityForm({...securityForm, currentPassword: e.target.value})}
-                          className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
+                          className="w-full h-12 px-4 pr-12 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-4 top-[38px] text-zinc-500 hover:text-primary transition-colors focus:outline-none"
+                        >
+                          {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                      </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2 relative group">
                         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Nouveau mot de passe</label>
                         <input 
-                          type="password" 
+                          type={showNewPassword ? "text" : "password"} 
                           placeholder="••••••••" 
                           value={securityForm.newPassword}
                           onChange={e => setSecurityForm({...securityForm, newPassword: e.target.value})}
-                          className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
+                          className="w-full h-12 px-4 pr-12 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-4 top-[38px] text-zinc-500 hover:text-primary transition-colors focus:outline-none"
+                        >
+                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                      </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2 relative group">
                         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Confirmer le mot de passe</label>
                         <input 
-                          type="password" 
+                          type={showConfirmPassword ? "text" : "password"} 
                           placeholder="••••••••" 
                           value={securityForm.confirmPassword}
                           onChange={e => setSecurityForm({...securityForm, confirmPassword: e.target.value})}
-                          className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
+                          className="w-full h-12 px-4 pr-12 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium" 
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-4 top-[38px] text-zinc-500 hover:text-primary transition-colors focus:outline-none"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                      </div>
                   </div>
                </div>

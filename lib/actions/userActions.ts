@@ -88,11 +88,32 @@ export async function getAllUsersWithEmails() {
       email: u.email,
       full_name: u.user_metadata?.full_name || "Sans Nom",
       role: u.user_metadata?.role || "manager",
-      last_login: u.last_sign_in_at
+      last_login: u.last_sign_in_at,
+      is_active: !u.banned_until
     }));
 
     return { success: true, users };
   } catch (error) {
     return { success: false, users: [] };
+  }
+}
+
+export async function toggleUserStatusAction(userId: string, isActive: boolean) {
+  try {
+    const admin = createAdminClient();
+    
+    // Ban for 100 years if deactivating, or 'none' if activating
+    const { error } = await admin.auth.admin.updateUserById(userId, {
+      ban_duration: isActive ? 'none' : '876000h'
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/dashboard/users");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }

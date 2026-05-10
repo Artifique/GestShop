@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LayoutGrid, Lock, Mail, Store } from "lucide-react";
+import { LayoutGrid, Lock, Mail, Store, Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -27,6 +27,7 @@ import { useState } from "react";
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -108,11 +109,19 @@ export default function LoginPage() {
                         <div className="relative group">
                           <Lock className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500 group-focus-within:text-primary transition-colors" />
                           <Input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className="h-12 pl-12 bg-input border-border text-foreground rounded-xl focus:ring-primary/50 focus:border-primary transition-all"
+                            className="h-12 pl-12 pr-12 bg-input border-border text-foreground rounded-xl focus:ring-primary/50 focus:border-primary transition-all"
                             {...field}
-                          />                        </div>
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-3.5 text-zinc-500 hover:text-primary transition-colors focus:outline-none"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
