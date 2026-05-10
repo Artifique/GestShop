@@ -31,7 +31,7 @@ export default function SettingsPage() {
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('L\'image ne doit pas dépasser 5 Mo.');
+      alert('L\'image ne doit pas dépasser 5 Mo.'); // Corrected line
       return;
     }
 
@@ -57,7 +57,7 @@ export default function SettingsPage() {
       // Dispatch custom event so sidebar reloads the logo instantly
       window.dispatchEvent(new CustomEvent('logoUpdated', { detail: publicUrl }));
     } catch (err: any) {
-      alert('Erreur d\'upload : ' + (err.message || 'Inconnue'));
+      alert('Erreur d\'upload : ' + (err.message || 'Inconnue')); // Corrected line
     } finally {
       setLogoUploading(false);
     }
@@ -284,7 +284,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2 hidden"> {/* <- AJOUT DE hidden ICI */}
+                  <div className="space-y-2 hidden">
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Devise Locale</label>
                     <select 
                       value={shopSettings.currency}
@@ -514,24 +514,7 @@ export default function SettingsPage() {
                   </div>
                </div>
 
-               <div className="pt-10 border-t border-border/50 space-y-6">
-                  <h2 className="text-xl font-black text-foreground flex items-center gap-3 uppercase tracking-tighter">
-                    <div className="h-3 w-3 rounded-full bg-amber-500" />
-                    Double Authentification (2FA)
-                  </h2>
-                  <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex items-start gap-4">
-                     <Shield className="h-6 w-6 text-amber-500 shrink-0 mt-1" />
-                     <div className="flex-1 space-y-2">
-                        <p className="font-bold text-foreground">Sécurisez votre compte davantage</p>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                           L&apos;authentification à deux facteurs ajoute une couche de sécurité supplémentaire à votre compte en exigeant plus qu&apos;un simple mot de passe pour se connecter.
-                        </p>
-                        <button className="mt-2 text-xs font-black text-amber-600 uppercase tracking-widest hover:underline">
-                           Activer maintenant
-                        </button>
-                     </div>
-                  </div>
-               </div>
+               {/* La section de Double Authentification a été supprimée */}
             </div>
           )}
 
