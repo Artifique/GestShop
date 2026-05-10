@@ -213,34 +213,71 @@ export default function PosPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 pb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 pb-6">
             {filteredProducts.map((product) => (
               <button 
                 key={product.id}
                 onClick={() => addToCart(product)}
                 disabled={product.stock <= 0}
                 className={cn(
-                  "flex flex-col p-4 rounded-3xl border border-border/50 transition-all text-left hover:scale-[1.02] active:scale-[0.98] group",
-                  product.stock <= 0 ? "opacity-50 grayscale cursor-not-allowed" : "bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+                  "relative flex flex-col rounded-[20px] border border-border/50 bg-card overflow-hidden transition-all duration-300 text-left group",
+                  product.stock <= 0 
+                    ? "opacity-60 grayscale cursor-not-allowed" 
+                    : "hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30"
                 )}
               >
-                <div className="h-32 w-full rounded-2xl bg-muted/50 mb-4 flex items-center justify-center overflow-hidden">
+                {/* Image Section */}
+                <div className="relative h-40 w-full bg-muted/30 overflow-hidden">
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name} 
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
                   ) : (
-                    <Package className="h-10 w-10 text-muted-foreground/30" />
+                    <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-muted/50 to-muted">
+                      <Package className="h-12 w-12 text-muted-foreground/20" />
+                    </div>
                   )}
+                  {/* Stock Badge */}
+                  <div className="absolute top-3 right-3">
+                    <span className={cn(
+                      "backdrop-blur-md text-[10px] font-black px-3 py-1 rounded-full border shadow-sm tracking-wide",
+                      product.stock > 10 
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                        : product.stock > 0
+                        ? "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400"
+                        : "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400"
+                    )}>
+                      {product.stock <= 0 ? "Rupture" : `${product.stock} dispo`}
+                    </span>
+                  </div>
+                  
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 flex items-center justify-center">
+                      <Plus className="h-6 w-6" />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 mb-3">{product.sku}</p>
-                <div className="mt-auto flex items-center justify-between">
-                  <span className="text-lg font-black text-primary">{product.price.toFixed(2)} €</span>
-                  <span className={cn(
-                    "text-[10px] font-bold px-2 py-1 rounded-lg",
-                    product.stock > 10 ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
-                  )}>
-                    {product.stock} en stock
-                  </span>
+
+                {/* Content Section */}
+                <div className="p-4 flex flex-col flex-1">
+                  <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors mb-1">
+                    {product.name}
+                  </h3>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">
+                    {product.sku}
+                  </p>
+                  
+                  <div className="mt-auto pt-3 border-t border-border/50 flex items-end justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-0.5">Prix</span>
+                      <span className="text-xl font-black text-foreground tracking-tighter">
+                        {product.price.toFixed(2)} <span className="text-primary text-sm font-bold">€</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </button>
             ))}

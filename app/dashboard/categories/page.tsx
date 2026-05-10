@@ -6,10 +6,14 @@ import { Modal } from "@/components/ui/modal";
 import { SuccessDialog, ErrorDialog, DeleteDialog } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { categoryService } from "@/lib/services/categoryService";
-import { Category } from "@/lib/models/types";
+import { productService } from "@/lib/services/productService";
+import { Category, Product } from "@/lib/models/types";
+import { useRouter } from "next/navigation";
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -23,8 +27,12 @@ export default function CategoriesPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const data = await categoryService.getAll();
-    setCategories(data);
+    const [catData, prodData] = await Promise.all([
+      categoryService.getAll(),
+      productService.getAll()
+    ]);
+    setCategories(catData);
+    setProducts(prodData);
     setLoading(false);
   }, []);
 
@@ -109,8 +117,12 @@ export default function CategoriesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCategories.map((category) => (
-          <div key={category.id} className="glass-card rounded-[32px] p-8 group hover:translate-y-[-4px] transition-all">
+        {filteredCategories.map((category) => {
+          const categoryProducts = products.filter(p => p.category_id === category.id);
+          const totalStock = categoryProducts.reduce((sum, p) => sum + p.stock, 0);
+
+          return (
+          <div key={category.id} className="glass-card rounded-[32px] p-8 group hover:translate-y-[-4px] transition-all flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                 <Tag className="h-7 w-7" />
@@ -126,19 +138,35 @@ export default function CategoriesPage() {
             </div>
             
             <h3 className="text-xl font-black text-foreground tracking-tight mb-2">{category.name}</h3>
-            <p className="text-sm text-muted-foreground font-medium mb-6 line-clamp-2 h-10">{category.description}</p>
+            <p className="text-sm text-muted-foreground font-medium mb-6 line-clamp-2 min-h-[40px]">{category.description}</p>
             
-            <div className="pt-6 border-t border-border/50 flex items-center justify-between">
+            <div className="flex items-center gap-6 mb-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+               <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Articles</span>
+                  <span className="text-xl font-black text-foreground tracking-tighter">{categoryProducts.length}</span>
+               </div>
+               <div className="w-px h-8 bg-border/50"></div>
+               <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Stock Total</span>
+                  <span className="text-xl font-black text-primary tracking-tighter">{totalStock}</span>
+               </div>
+            </div>
+            
+            <div className="pt-6 border-t border-border/50 mt-auto flex items-center justify-between">
               <div className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[10px]">
                 <Layers className="h-4 w-4" />
-                Détails
+                Gérer
               </div>
-              <button className="text-[10px] font-black text-muted-foreground uppercase tracking-widest hover:text-primary transition-colors">
+              <button 
+                onClick={() => router.push(`/dashboard/products?category=${category.id}`)}
+                className="text-[10px] font-black text-muted-foreground uppercase tracking-widest hover:text-primary transition-colors"
+              >
                 Voir les articles
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
         {filteredCategories.length === 0 && !loading && (
           <div className="col-span-full py-20 text-center text-muted-foreground italic">Aucune catégorie trouvée.</div>
         )}
