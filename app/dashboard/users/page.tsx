@@ -7,12 +7,12 @@ import { SuccessDialog, DeleteDialog, ErrorDialog } from "@/components/ui/alert-
 import { cn } from "@/lib/utils";
 import { authService } from "@/lib/services/authService";
 import { Profile } from "@/lib/models/types";
-import { createUserAction, deleteUserAction, updateUserRoleAction } from "@/lib/actions/userActions";
+import { createUserAction, deleteUserAction, updateUserRoleAction, getAllUsersWithEmails } from "@/lib/actions/userActions";
 import { useRouter } from "next/navigation";
 
 export default function UsersPage() {
   const router = useRouter();
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -37,8 +37,14 @@ export default function UsersPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const profiles = await authService.getAllProfiles();
-    setUsers(profiles);
+    const result = await getAllUsersWithEmails();
+    if (result.success) {
+      setUsers(result.users);
+    } else {
+      // Fallback
+      const profiles = await authService.getAllProfiles();
+      setUsers(profiles);
+    }
     setLoading(false);
   }, []);
 
@@ -59,13 +65,13 @@ export default function UsersPage() {
     setIsAddModalOpen(true);
   };
 
-  const handleOpenEdit = (user: Profile) => {
+  const handleOpenEdit = (user: any) => {
     setSelectedUser(user);
     setFormData({ full_name: user.full_name || "", email: "", role: user.role, password: "" });
     setIsEditModalOpen(true);
   };
 
-  const handleOpenDelete = (user: Profile) => {
+  const handleOpenDelete = (user: any) => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
@@ -189,7 +195,7 @@ export default function UsersPage() {
                 <h3 className="text-xl font-black text-foreground tracking-tight leading-tight">{user.full_name || "Sans Nom"}</h3>
                 <div className="flex items-center gap-2 text-muted-foreground mt-1">
                   <Mail className="h-3.5 w-3.5" />
-                  <span className="text-sm font-medium">{user.id.substring(0, 8)}...</span>
+                  <span className="text-sm font-medium">{user.email || user.id.substring(0, 8) + "..."}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">

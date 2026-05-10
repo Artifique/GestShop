@@ -75,3 +75,24 @@ export async function updateUserRoleAction(userId: string, role: "admin" | "mana
     return { success: false, error: error.message };
   }
 }
+
+export async function getAllUsersWithEmails() {
+  try {
+    const admin = createAdminClient();
+    const { data: authData, error: authError } = await admin.auth.admin.listUsers();
+    
+    if (authError) return { success: false, users: [] };
+
+    const users = authData.users.map(u => ({
+      id: u.id,
+      email: u.email,
+      full_name: u.user_metadata?.full_name || "Sans Nom",
+      role: u.user_metadata?.role || "manager",
+      last_login: u.last_sign_in_at
+    }));
+
+    return { success: true, users };
+  } catch (error) {
+    return { success: false, users: [] };
+  }
+}
