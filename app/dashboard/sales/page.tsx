@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Search, History, Filter, Download, Eye, FileText, Calendar, Package } from "lucide-react";
@@ -155,6 +155,22 @@ export default function SalesPage() {
               >
                 Précédent
               </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={cn(
+                      "h-8 w-8 rounded-lg text-xs font-bold transition-all",
+                      currentPage === page 
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                        : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
               <button 
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
