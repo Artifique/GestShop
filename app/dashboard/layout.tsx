@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { 
@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 
 import { authService } from "@/lib/services/authService";
 import { productService } from "@/lib/services/productService";
+import { settingsService } from "@/lib/services/settingsService";
 import { Profile, Product } from "@/lib/models/types";
 import { useRouter } from "next/navigation";
 
@@ -37,6 +38,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [user, setUser] = React.useState<Profile | null>(null);
   const [lowStockProducts, setLowStockProducts] = React.useState<Product[]>([]);
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
+  const [shopName, setShopName] = React.useState("GestShop");
   const router = useRouter();
 
   React.useEffect(() => {
@@ -46,8 +49,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       
       const prods = await productService.getAll();
       setLowStockProducts(prods.filter(p => p.stock <= 5));
+
+      const settings = await settingsService.getSettings();
+      if (settings?.logo_url) setLogoUrl(settings.logo_url);
+      if (settings?.shop_name) setShopName(settings.shop_name);
     }
     fetchData();
+
+    // Listen for logo updates from the settings page
+    const handleLogoUpdate = (e: Event) => {
+      setLogoUrl((e as CustomEvent).detail);
+    };
+    window.addEventListener('logoUpdated', handleLogoUpdate);
+    return () => window.removeEventListener('logoUpdated', handleLogoUpdate);
   }, []);
 
   const handleLogout = async () => {
@@ -74,10 +88,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="h-full bg-card flex flex-col border-r border-border shadow-2xl transition-all duration-300">
       {/* Logo */}
       <div className="p-8 pb-12 flex items-center gap-3">
-         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Box className="h-6 w-6 text-primary-foreground" />
-         </div>
-         <span className="text-xl font-bold text-foreground tracking-tight italic">GestShop</span>
+         {logoUrl ? (
+           <div className="h-10 w-10 rounded-xl overflow-hidden border border-border/50 bg-card flex items-center justify-center shrink-0">
+             <img src={logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+           </div>
+         ) : (
+           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/20">
+             <Box className="h-6 w-6 text-primary-foreground" />
+           </div>
+         )}
+         <span className="text-xl font-bold text-foreground tracking-tight italic">{shopName}</span>
       </div>
 
       {/* Navigation */}

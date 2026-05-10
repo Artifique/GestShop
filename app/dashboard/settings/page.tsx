@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Settings, User, Bell, Shield, Globe, CreditCard, Save, RefreshCw, Loader2, Eye, EyeOff } from "lucide-react";
+import { Settings, User, Bell, Shield, Globe, CreditCard, Save, RefreshCw, Loader2, Eye, EyeOff, Upload, ImageIcon } from "lucide-react";
 import { SuccessDialog } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/app/theme-provider";
@@ -9,6 +9,7 @@ import { useTheme } from "@/app/theme-provider";
 import { settingsService } from "@/lib/services/settingsService";
 import { authService } from "@/lib/services/authService";
 import { ShopSettings, Profile } from "@/lib/models/types";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -18,14 +19,57 @@ export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner une image (JPG, PNG, SVG...).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('L\'image ne doit pas dépasser 5 Mo.');
+      return;
+    }
+
+    setLogoUploading(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop();
+      const filename = `logo_${Date.now()}.${ext}`;
+      
+      const { data, error } = await supabase.storage
+        .from('images')
+        .upload(filename, file, { upsert: true, contentType: file.type });
+      
+      if (error) throw error;
+      
+      const { data: urlData } = supabase.storage.from('images').getPublicUrl(data.path);
+      const publicUrl = urlData.publicUrl;
+      
+      // Save immediately to settings
+      await settingsService.updateSettings({ ...shopSettings, logo_url: publicUrl });
+      setShopSettings(prev => ({ ...prev, logo_url: publicUrl }));
+
+      // Dispatch custom event so sidebar reloads the logo instantly
+      window.dispatchEvent(new CustomEvent('logoUpdated', { detail: publicUrl }));
+    } catch (err: any) {
+      alert('Erreur d\'upload : ' + (err.message || 'Inconnue'));
+    } finally {
+      setLogoUploading(false);
+    }
+  };
 
   const [shopSettings, setShopSettings] = useState<ShopSettings>({
     id: 1,
     shop_name: "GestShop Boutique",
     contact_email: "contact@gestshop.com",
     currency: "EUR",
-    timezone: "UTC+1"
+    timezone: "UTC+1",
+    logo_url: ""
   });
 
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
@@ -187,6 +231,56 @@ export default function SettingsPage() {
                       onChange={e => setShopSettings({...shopSettings, contact_email: e.target.value})}
                       className="w-full h-12 px-4 bg-muted/50 border border-border/50 text-foreground rounded-2xl focus:border-primary outline-none transition-all font-medium"
                     />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Logo de la Boutique</label>
+                    <div className="flex items-center gap-4">
+                      {/* Logo Preview */}
+                      <div className="h-20 w-20 rounded-2xl bg-muted/50 border border-border/50 shrink-0 overflow-hidden flex items-center justify-center">
+                        {shopSettings.logo_url ? (
+                          <img src={shopSettings.logo_url} alt="Logo" className="max-h-full max-w-full object-contain p-2" />
+                        ) : (
+                          <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                        )}
+                      </div>
+                      {/* Upload Button */}
+                      <div className="flex-1 space-y-2">
+                        <label
+                          htmlFor="logo-upload"
+                          className={cn(
+                            "flex items-center gap-3 h-12 px-5 rounded-2xl border cursor-pointer transition-all font-bold text-sm",
+                            logoUploading
+                              ? "bg-muted/30 border-border/50 text-muted-foreground cursor-wait"
+                              : "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+                          )}
+                        >
+                          {logoUploading ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Upload className="h-5 w-5" />
+                          )}
+                          {logoUploading ? "Upload en cours..." : "Choisir un fichier"}
+                        </label>
+                        <input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                          disabled={logoUploading}
+                        />
+                        <p className="text-[10px] text-muted-foreground pl-1">JPG, PNG, SVG ou WEBP. Max 5 Mo. Le logo s'affichera dans le menu de gauche.</p>
+                        {shopSettings.logo_url && (
+                          <button
+                            type="button"
+                            onClick={() => setShopSettings(prev => ({ ...prev, logo_url: '' }))}
+                            className="text-[10px] font-bold text-rose-500 hover:underline pl-1"
+                          >
+                            Supprimer le logo
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Devise Locale</label>

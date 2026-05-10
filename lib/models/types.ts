@@ -71,5 +71,6 @@ export interface ShopSettings {
   contact_email: string;
   currency: string;
   timezone: string;
+  logo_url?: string;
   updated_at?: string;
 }

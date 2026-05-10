@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS settings (
     contact_email TEXT,
     currency TEXT DEFAULT 'EUR',
     timezone TEXT DEFAULT 'UTC+1',
+    logo_url TEXT,
     updated_at TIMESTAMPTZ DEFAULT now(),
     CONSTRAINT one_row CHECK (id = 1)
 );
@@ -101,8 +102,11 @@ CREATE POLICY "Enable all for authenticated users" ON settings FOR ALL USING (au
 
 -- 5. INITIAL DATA
 INSERT INTO settings (id, shop_name, contact_email, currency, timezone)
-VALUES (1, 'GestShop Boutique', 'contact@gestshop.com', 'EUR', 'UTC+1')
+VALUES (1, 'GestShop Boutique', 'contact@gestshop.com', 'XOF', 'UTC')
 ON CONFLICT (id) DO NOTHING;
+
+-- Add logo_url column if not exists (safe for re-runs)
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS logo_url TEXT;
 
 -- 6. AUTH & TRIGGERS
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -169,3 +173,40 @@ BEGIN
     );
   END IF;
 END $$;
+
+-- =============================================================
+-- 8. SUPABASE STORAGE - Bucket 'images'
+-- =============================================================
+-- Crée le bucket 'images' public s'il n'existe pas déjà
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('images', 'images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Politique : Tout le monde peut LIRE les images (pour affichage public du logo)
+CREATE POLICY "Lecture publique images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'images');
+
+-- Politique : Seuls les utilisateurs connectés peuvent UPLOADER des images
+CREATE POLICY "Upload authentifié images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (
+    bucket_id = 'images'
+    AND auth.role() = 'authenticated'
+  );
+
+-- Politique : Seuls les utilisateurs connectés peuvent METTRE À JOUR leurs images
+CREATE POLICY "Mise à jour authentifiée images"
+  ON storage.objects FOR UPDATE
+  USING (
+    bucket_id = 'images'
+    AND auth.role() = 'authenticated'
+  );
+
+-- Politique : Seuls les utilisateurs connectés peuvent SUPPRIMER des images
+CREATE POLICY "Suppression authentifiée images"
+  ON storage.objects FOR DELETE
+  USING (
+    bucket_id = 'images'
+    AND auth.role() = 'authenticated'
+  );
