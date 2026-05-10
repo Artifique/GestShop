@@ -10,6 +10,8 @@ import { customerService } from "@/lib/services/customerService";
 import { saleService } from "@/lib/services/saleService";
 import { authService } from "@/lib/services/authService";
 import { Product, Customer, Profile } from "@/lib/models/types";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface CartItem extends Product {
   quantity: number;
@@ -112,6 +114,65 @@ export default function PosPage() {
     const success = await saleService.createSale(saleData, saleItems);
 
     if (success) {
+      // Generate Receipt
+      try {
+        const doc = new jsPDF({ format: [80, 200] });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("GESTSHOP", 40, 10, { align: "center" });
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text("Ticket de caisse", 40, 16, { align: "center" });
+        doc.text(`Date: ${new Date().toLocaleString()}`, 40, 22, { align: "center" });
+        
+        let customerName = "Client de passage";
+        if (selectedCustomerId) {
+          const c = customers.find(c => c.id === selectedCustomerId);
+          if (c) customerName = c.name;
+        }
+        doc.text(`Client: ${customerName}`, 5, 32);
+        
+        const tableRows = cart.map(item => [
+          item.name.substring(0, 15),
+          item.quantity.toString(),
+          `${item.price.toFixed(2)}`,
+          `${(item.quantity * item.price).toFixed(2)}`
+        ]);
+        
+        autoTable(doc, {
+          head: [["Article", "Qte", "PU", "Total"]],
+          body: tableRows,
+          startY: 38,
+          theme: "plain",
+          styles: { fontSize: 8, cellPadding: 1 },
+          headStyles: { fontStyle: 'bold' },
+          columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 10, halign: 'center' },
+            2: { cellWidth: 15, halign: 'right' },
+            3: { cellWidth: 15, halign: 'right' }
+          },
+          margin: { left: 5, right: 5 }
+        });
+        
+        const finalY = (doc as any).lastAutoTable.finalY || 40;
+        
+        doc.setFont("helvetica", "bold");
+        doc.text(`TOTAL: ${total.toFixed(2)} EUR`, 75, finalY + 10, { align: "right" });
+        doc.setFont("helvetica", "normal");
+        doc.text(`Paiement: ${paymentMethod === 'cash' ? 'Espèces' : 'Carte'}`, 75, finalY + 15, { align: "right" });
+        
+        doc.setFontSize(8);
+        doc.text("Merci de votre visite !", 40, finalY + 25, { align: "center" });
+        
+        // Open PDF in new tab and prompt print
+        doc.autoPrint();
+        window.open(doc.output('bloburl'), '_blank');
+      } catch (err) {
+        console.error("Erreur facture", err);
+      }
+
       setSuccessOpen(true);
       setCart([]);
       setSelectedCustomerId("");
