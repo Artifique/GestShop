@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal } from "@/components/ui/modal";
@@ -191,9 +191,9 @@ export default function PosPage() {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-120px)] gap-6 overflow-hidden animate-in fade-in duration-700">
+    <div className="flex flex-col lg:flex-row min-h-screen gap-6 animate-in fade-in duration-700">>
       {/* Left Area: Product Selection */}
-      <div className="flex-1 flex flex-col gap-6 overflow-hidden">
+      <div className="flex-1 flex flex-col gap-6 overflow-auto min-h-0">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight italic">Point de <span className="text-primary italic">Vente</span></h1>
@@ -213,16 +213,16 @@ export default function PosPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 pb-6">
             {filteredProducts.map((product) => (
               <button 
                 key={product.id}
                 onClick={() => addToCart(product)}
                 disabled={product.stock <= 0}
                 className={cn(
-                  "relative flex flex-col rounded-[20px] border border-border/50 bg-card overflow-hidden transition-all duration-300 text-left group",
-                  product.stock <= 0 
-                    ? "opacity-60 grayscale cursor-not-allowed" 
+                  "relative flex flex-col w-full rounded-[20px] border border-border/50 bg-card overflow-hidden transition-all duration-300 text-left group",
+                  product.stock <= 0
+                    ? "opacity-60 grayscale cursor-not-allowed"
                     : "hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30"
                 )}
               >
