@@ -23,8 +23,18 @@ export async function createUserAction(userData: {
     });
 
     if (error) {
-      console.error("Error creating user:", error);
-      return { success: false, error: error.message };
+      console.error("====== ERREUR DE CREATION UTILISATEUR ======");
+      console.error("Message:", error.message);
+      console.error("Status:", error.status);
+      console.error("Détails complets:", JSON.stringify(error, null, 2));
+      console.error("============================================");
+      
+      let errorMessage = error.message;
+      if (errorMessage.includes("Database error creating new user")) {
+        errorMessage = "Erreur Supabase (Base de données) : Le déclencheur (Trigger) 'handle_new_user' a échoué. Avez-vous bien exécuté le code SQL dans votre tableau de bord Supabase ?";
+      }
+      
+      return { success: false, error: errorMessage };
     }
 
     revalidatePath("/dashboard/users");
