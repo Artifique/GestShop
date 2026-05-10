@@ -27,21 +27,27 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 import { authService } from "@/lib/services/authService";
-import { Profile } from "@/lib/models/types";
+import { productService } from "@/lib/services/productService";
+import { Profile, Product } from "@/lib/models/types";
 import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [user, setUser] = React.useState<Profile | null>(null);
+  const [lowStockProducts, setLowStockProducts] = React.useState<Product[]>([]);
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const router = useRouter();
 
   React.useEffect(() => {
-    async function fetchUser() {
-      const data = await authService.getCurrentUser();
-      setUser(data);
+    async function fetchData() {
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+      
+      const prods = await productService.getAll();
+      setLowStockProducts(prods.filter(p => p.stock <= 5));
     }
-    fetchUser();
+    fetchData();
   }, []);
 
   const handleLogout = async () => {
@@ -158,10 +164,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <Moon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     )}
                 </button>
-                 <button className="relative p-2.5 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors border border-border group hidden sm:block">
-                    <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="absolute top-2.5 right-2.5 h-2 w-2 bg-primary rounded-full border-2 border-background" />
-                 </button>
+                 <div className="relative hidden sm:block">
+                   <button 
+                     onClick={() => setShowNotifications(!showNotifications)}
+                     className="relative p-2.5 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors border border-border group"
+                   >
+                      <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                      {lowStockProducts.length > 0 && (
+                        <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-rose-500 rounded-full border-2 border-background animate-pulse" />
+                      )}
+                   </button>
+
+                   {showNotifications && (
+                     <div className="absolute right-0 mt-3 w-80 bg-card border border-border/50 rounded-[24px] shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                       <div className="p-4 border-b border-border/50 flex items-center justify-between bg-muted/30">
+                         <h4 className="font-bold text-foreground">Notifications</h4>
+                         <span className="text-[10px] bg-rose-500/10 text-rose-500 px-2.5 py-1 rounded-full font-black">
+                           {lowStockProducts.length} alerte(s)
+                         </span>
+                       </div>
+                       <div className="max-h-[320px] overflow-y-auto custom-scrollbar p-2">
+                         {lowStockProducts.length === 0 ? (
+                           <div className="p-8 text-center text-muted-foreground">
+                              <Bell className="h-8 w-8 mx-auto mb-3 opacity-20" />
+                              <p className="text-sm font-medium">Aucune nouvelle notification.</p>
+                           </div>
+                         ) : (
+                           lowStockProducts.map(p => (
+                             <div key={p.id} className="p-3 mb-1 hover:bg-muted/50 rounded-xl transition-colors flex items-start gap-3 group/notif cursor-pointer" onClick={() => router.push('/dashboard/inventory')}>
+                               <div className="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0 border border-rose-500/20">
+                                 <Box className="h-5 w-5 text-rose-500" />
+                               </div>
+                               <div>
+                                 <p className="text-sm font-bold text-foreground leading-tight group-hover/notif:text-primary transition-colors">{p.name}</p>
+                                 <p className="text-xs text-rose-500 font-bold mt-1.5 flex items-center gap-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                    Stock critique: {p.stock} restant(s)
+                                 </p>
+                               </div>
+                             </div>
+                           ))
+                         )}
+                       </div>
+                       <div className="p-3 border-t border-border/50 text-center bg-muted/30">
+                         <a href="/dashboard/inventory" className="text-xs font-bold text-primary hover:text-primary/80 uppercase tracking-widest transition-colors">Gérer l'inventaire</a>
+                       </div>
+                     </div>
+                   )}
+                 </div>
                  <div className="h-10 w-[1px] bg-border/50 mx-1 lg:mx-2 hidden sm:block" />
                  <div className="flex items-center gap-3 pl-1 lg:pl-2">
                     <div className="text-right hidden xl:block">
