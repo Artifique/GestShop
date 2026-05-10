@@ -162,16 +162,21 @@ export default function LoginPage() {
                 Analysez vos ventes, gérez vos fournisseurs et optimisez vos profits avec GestShop.
               </p>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 mt-8">
                  {[
-                   { label: "Ventes réelles", value: "+24%", color: "text-emerald-400" },
-                   { label: "Clients actifs", value: "1.2k", color: "text-blue-400" },
-                   { label: "Stock critique", value: "3", color: "text-amber-400" },
-                   { label: "Marge brute", value: "32%", color: "text-violet-400" }
-                 ].map((stat, i) => (
-                   <div key={i} className="bg-secondary rounded-2xl p-4 border border-border hover:bg-secondary/50 transition-colors">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wider font-bold mb-1">{stat.label}</p>
-                      <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                   { label: "Point de Vente (POS)", desc: "Encaissement rapide et fluide", icon: <Store className="h-6 w-6 text-emerald-400" /> },
+                   { label: "Gestion de Stock", desc: "Suivi en temps réel des inventaires", icon: <LayoutGrid className="h-6 w-6 text-blue-400" /> },
+                   { label: "Base Clients", desc: "Fidélisation et historique d'achats", icon: <Mail className="h-6 w-6 text-amber-400" /> },
+                   { label: "Sécurité Avancée", desc: "Protection des données métier", icon: <Lock className="h-6 w-6 text-violet-400" /> }
+                 ].map((feature, i) => (
+                   <div key={i} className="flex items-center gap-4 bg-secondary/50 rounded-2xl p-4 border border-border hover:bg-secondary transition-colors">
+                      <div className="h-12 w-12 rounded-xl bg-[#0A0A1A] border border-border/50 flex items-center justify-center shadow-inner shrink-0">
+                         {feature.icon}
+                      </div>
+                      <div>
+                         <p className="font-bold text-foreground text-sm">{feature.label}</p>
+                         <p className="text-xs text-zinc-400 mt-0.5">{feature.desc}</p>
+                      </div>
                    </div>
                  ))}
               </div>
