@@ -14,7 +14,7 @@ export const ReceiptPDF = ({ sale }: { sale: Sale }) => (
       <View>
         <Text style={styles.header}>Reçu de Paiement</Text>
         <Text style={styles.text}>N°: {sale.receipt_number}</Text>
-        <Text style={styles.text}>Total: {sale.total_amount} XOF</Text>
+        <Text style={styles.text}>Total: {sale.total_amount} FCFA</Text>
         <Text style={styles.text}>Date: {sale.created_at ? new Date(sale.created_at).toLocaleDateString() : "N/A"}</Text>
       </View>
     </Page>

@@ -98,7 +98,9 @@ export default function SettingsPage() {
         authService.getCurrentUser()
       ]);
       
-      if (sData) setShopSettings(sData);
+      if (sData) {
+        setShopSettings(sData);
+      }
       if (pData) {
         setCurrentUser(pData);
         setProfileForm({ full_name: pData.full_name || "" });
@@ -282,7 +284,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 hidden"> {/* <- AJOUT DE hidden ICI */}
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-1">Devise Locale</label>
                     <select 
                       value={shopSettings.currency}
